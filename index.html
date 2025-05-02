@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Lector Antoniana</title>
+  
+  <!-- ZXing para leer códigos -->
   <script type="module">
     import { BrowserBarcodeReader } from "https://cdn.jsdelivr.net/npm/@zxing/browser@0.0.10/+esm";
 
@@ -37,7 +39,9 @@
     });
   </script>
 
+  <!-- Tailwind CSS -->
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+
   <style>
     :root {
       --primary-blue: #0c3553;
@@ -48,13 +52,28 @@
 
     body {
       background-color: var(--light-bg);
-      font-family: sans-serif;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    .antoniana-header {
+      background-color: var(--primary-blue);
+      color: var(--white);
+    }
+
+    .antoniana-title {
+      color: var(--primary-blue);
+    }
+
+    .antoniana-table thead {
+      background-color: var(--primary-brown);
+      color: var(--white);
     }
   </style>
 </head>
+
 <body class="p-4 text-gray-900">
   <div class="max-w-2xl mx-auto">
-    <h1 class="text-2xl font-bold mb-4 text-center text-white bg-[--primary-blue] py-3 rounded-lg shadow">
+    <h1 class="text-2xl font-bold mb-4 text-center antoniana-header py-3 rounded-lg shadow">
       📷 Lector de Códigos - Juventud Antoniana
     </h1>
 
@@ -69,16 +88,18 @@
     </div>
 
     <div class="bg-white rounded-lg shadow p-4">
-      <h2 class="text-lg font-semibold mb-2 text-[--primary-blue]">📋 Últimos Escaneos</h2>
-      <table class="w-full text-sm">
-        <thead>
-          <tr class="bg-[--primary-blue] text-white">
-            <th class="px-2 py-1 text-left">Código</th>
-            <th class="px-2 py-1 text-left">Fecha y Hora</th>
-          </tr>
-        </thead>
-        <tbody id="resultado"></tbody>
-      </table>
+      <h2 class="text-lg font-semibold mb-3 antoniana-title">📋 Últimos Escaneos</h2>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm antoniana-table">
+          <thead>
+            <tr>
+              <th class="px-2 py-1 text-left">Código</th>
+              <th class="px-2 py-1 text-left">Fecha y Hora</th>
+            </tr>
+          </thead>
+          <tbody id="resultado"></tbody>
+        </table>
+      </div>
     </div>
   </div>
 </body>
