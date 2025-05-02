@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Escáner Antoniana</title>
+  <script src="https://unpkg.com/quagga@0.12.1/dist/quagga.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    // Colores personalizados
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'primary-blue': '#0c3553',
+            'primary-brown': '#3C2713',
+            'light-bg': '#F0F5F5',
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-primary-blue text-white font-sans">
+
+  <div class="min-h-screen flex flex-col items-center justify-center p-4">
+    <h1 class="text-3xl font-bold mb-4 text-primary-brown">Escáner Antoniana</h1>
+
+    <div class="w-full max-w-lg bg-light-bg rounded-2xl shadow-xl p-6 text-black">
+      <div id="scanner-container" class="rounded overflow-hidden mb-4">
+        <video id="scanner" class="w-full rounded-lg"></video>
+      </div>
+      <p class="text-center font-semibold text-primary-blue">Código detectado:</p>
+      <p id="result" class="text-center text-xl font-bold text-primary-brown mt-2">---</p>
+    </div>
+  </div>
+
+  <script>
+    Quagga.init({
+      inputStream: {
+        type: "LiveStream",
+        target: document.querySelector('#scanner'),
+        constraints: {
+          facingMode: "environment"
+        }
+      },
+      decoder: {
+        readers: ["ean_reader", "code_128_reader", "upc_reader"]
+      }
+    }, function (err) {
+      if (err) {
+        console.error(err);
+        return;
+      }
+      Quagga.start();
+    });
+
+    Quagga.onDetected((data) => {
+      const code = data.codeResult.code;
+      document.getElementById("result").innerText = code;
+    });
+  </script>
+</body>
+</html>
