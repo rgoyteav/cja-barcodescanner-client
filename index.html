@@ -3,66 +3,83 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Escáner Antoniana</title>
-  <script src="https://unpkg.com/quagga@0.12.1/dist/quagga.min.js"></script>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    // Colores personalizados
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            'primary-blue': '#0c3553',
-            'primary-brown': '#3C2713',
-            'light-bg': '#F0F5F5',
+  <title>Lector Antoniana</title>
+  <script type="module">
+    import { BrowserBarcodeReader } from "https://cdn.jsdelivr.net/npm/@zxing/browser@0.0.10/+esm";
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      const videoElement = document.getElementById("scanner");
+      const resultado = document.getElementById("resultado");
+
+      const codeReader = new BrowserBarcodeReader();
+
+      try {
+        const devices = await BrowserBarcodeReader.listVideoInputDevices();
+        const selectedDeviceId = devices[0]?.deviceId;
+
+        if (!selectedDeviceId) throw new Error("No se encontró cámara");
+
+        codeReader.decodeFromVideoDevice(selectedDeviceId, videoElement, (result, err) => {
+          if (result) {
+            const now = new Date().toLocaleString();
+            const row = document.createElement("tr");
+            row.innerHTML = `
+              <td class="border px-2 py-1">${result.getText()}</td>
+              <td class="border px-2 py-1">${now}</td>
+            `;
+            resultado.prepend(row);
           }
-        }
+        });
+      } catch (error) {
+        alert("Error al acceder a la cámara: " + error.message);
+        console.error(error);
       }
-    }
+    });
   </script>
+
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --primary-blue: #0c3553;
+      --primary-brown: #3C2713;
+      --light-bg: #F0F5F5;
+      --white: #FFFFFF;
+    }
+
+    body {
+      background-color: var(--light-bg);
+      font-family: sans-serif;
+    }
+  </style>
 </head>
-<body class="bg-primary-blue text-white font-sans">
+<body class="p-4 text-gray-900">
+  <div class="max-w-2xl mx-auto">
+    <h1 class="text-2xl font-bold mb-4 text-center text-white bg-[--primary-blue] py-3 rounded-lg shadow">
+      📷 Lector de Códigos - Juventud Antoniana
+    </h1>
 
-  <div class="min-h-screen flex flex-col items-center justify-center p-4">
-    <h1 class="text-3xl font-bold mb-4 text-primary-brown">Escáner Antoniana</h1>
-
-    <div class="w-full max-w-lg bg-light-bg rounded-2xl shadow-xl p-6 text-black">
-      <div id="scanner-container" class="rounded-xl overflow-hidden mb-4 bg-black max-w-full">
-        <video
-          id="scanner"
-          class="w-full aspect-video max-h-[60vh] rounded-lg"
-          playsinline
-        ></video>
+    <div class="rounded-xl overflow-hidden mb-4 bg-black max-w-full">
+      <video
+        id="scanner"
+        class="w-full min-h-[220px] max-h-[400px] rounded-lg bg-black"
+        autoplay
+        muted
+        playsinline
+      ></video>
     </div>
-      <p class="text-center font-semibold text-primary-blue">Código detectado:</p>
-      <p id="result" class="text-center text-xl font-bold text-primary-brown mt-2">---</p>
+
+    <div class="bg-white rounded-lg shadow p-4">
+      <h2 class="text-lg font-semibold mb-2 text-[--primary-blue]">📋 Últimos Escaneos</h2>
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="bg-[--primary-blue] text-white">
+            <th class="px-2 py-1 text-left">Código</th>
+            <th class="px-2 py-1 text-left">Fecha y Hora</th>
+          </tr>
+        </thead>
+        <tbody id="resultado"></tbody>
+      </table>
     </div>
   </div>
-
-  <script>
-    Quagga.init({
-      inputStream: {
-        type: "LiveStream",
-        target: document.querySelector('#scanner'),
-        constraints: {
-          facingMode: "environment"
-        }
-      },
-      decoder: {
-        readers: ["ean_reader", "code_128_reader", "upc_reader"]
-      }
-    }, function (err) {
-      if (err) {
-        console.error(err);
-        return;
-      }
-      Quagga.start();
-    });
-
-    Quagga.onDetected((data) => {
-      const code = data.codeResult.code;
-      document.getElementById("result").innerText = code;
-    });
-  </script>
 </body>
 </html>
